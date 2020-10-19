@@ -46,14 +46,10 @@ function map(array, fn) {
    reduce([1, 2, 3], (all, current) => all + current) // 6
  */
 function reduce(array, fn, initial = null) {
-  let newArr = initial ? [initial, ...array] : array;
-  let result;
-  for (let i = 0; i < newArr.length; i++) {
-    result = result ? fn(result, newArr[i], i, newArr) : newArr[i];
+  let result = initial;
+  for (let i = 0; i < array.length; i++) {
+    result = result ? fn(result, array[i], i, array) : array[i];
   }
-  // for (let element of newArr) {
-  //   result = result ? fn(result, element) : element;
-  // }
   return result;
 }
 
@@ -71,7 +67,6 @@ function upperProps(obj) {
   return Object.keys(obj).map(v => v.toUpperCase())
 }
 
-console.log(upperProps({ name: 'Сергей', lastName: 'Петров' }));
 
 /*
  Задание 5 *:
@@ -95,9 +90,5 @@ function createProxy(obj) {
   });
 }
 
-
-const obj = createProxy({});
-obj.foo = 2;
-console.log(obj.foo); // 4
 
 export { forEach, map, reduce, upperProps, createProxy };
