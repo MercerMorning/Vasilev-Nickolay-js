@@ -104,12 +104,10 @@ function returnBadArguments(fn, ...args) {
             result.push(arguments[i]);
         }
     }
+  return result;
   } catch (e) {
     console.log(e.message)
   }
-  
-
-  return result;
 }
 
 
