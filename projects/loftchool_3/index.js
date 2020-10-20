@@ -130,9 +130,6 @@ function calculator(number = 0) {
     if (typeof number !== 'number') {
       throw new Error('number is not a number');
     }
-  } catch(e) {
-    console.log(e.message);
-  }
   
     let obj = {
   
@@ -170,6 +167,8 @@ function calculator(number = 0) {
             
             result = result / arguments[i];
         }
+
+        return result;
       },
       
       mul() {
@@ -186,11 +185,15 @@ function calculator(number = 0) {
    
     return obj;
   
-  
+  } catch(e) {
+    console.log(e.message);
+  }
 }
 
-let calc = calculator(10);
-console.log(calc.div(1, 0, 3))
+let calc = calculator('dd');
+
+let cal = calculator(23);
+console.log(cal.div(1, 3, 3))
 
 /* При решении задач, постарайтесь использовать отладчик */
 
