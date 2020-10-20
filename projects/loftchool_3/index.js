@@ -16,30 +16,36 @@
    isAllTrue([1, 2, 3, 4, 5], n => n < 10) // вернет true
    isAllTrue([100, 2, 3, 4, 5], n => n < 10) // вернет false
  */
-function isAllTrue(array, fn) {
-  try {
-    if (!(array instanceof Array) || (array instanceof Array && array.length == 0)) {
-      throw new Error('empty array');
-    }
-    if (typeof fn !== 'function') {
-        throw new Error('fn is not a function');
-    }
-
-    for (let i = 0; i < array.length; i++) {
-        if (!fn(array[i])) {
-            return false;
-        }
-    }
-
-  return true;
-  } catch (e) {
-    console.log(e.message);
+function isArray(array) {
+  if (!(array instanceof Array) || (array instanceof Array && array.length == 0)) {
+    throw new Error('empty array');
   }
 }
 
-console.log(isAllTrue([], n => n < 10)) // вернет true
-console.log(isAllTrue([100, 2, 3, 4, 5], n => n < 10)) // вернет false
+function isFunction(fn) {
+  if (typeof fn !== 'function') {
+    throw new Error('fn is not a function');
+  }
+}
 
+function isNumber(number) {
+  if (isNaN(number)) {
+    throw new Error('number is not a number');
+  }
+}
+
+function isAllTrue(array, fn) {
+  isArray(array);
+  isFunction(fn);
+
+  for (let i = 0; i < array.length; i++) {
+      if (!fn(array[i])) {
+          return false;
+      }
+  }
+
+  return true;
+  }
 /*
  Задание 2:
 
@@ -57,22 +63,15 @@ console.log(isAllTrue([100, 2, 3, 4, 5], n => n < 10)) // вернет false
    isSomeTrue([1, 2, 3, 4, 5], n => n > 20) // вернет false
  */
 function isSomeTrue(array, fn) {
-  try {
-    if (!Array.isArray(array) || (Array.isArray(array) && !array.length)) {
-      throw new Error('empty array');
-    }
-    if (typeof fn != 'function') {
-      throw new Error('fn is not a function');
-    }
-    for (let element of array) {
-      if (fn(element)) {
-        return true
-      };
-    }
-    return false;
-  } catch (e) {
-    console.log(e.message);
+  isArray(array);
+  isFunction(fn);
+
+  for (let element of array) {
+    if (fn(element)) {
+      return true
+    };
   }
+  return false;
 }
 
 console.log(isSomeTrue([1, 2, 30, 4, 5], n => n > 20)) // вернет true
@@ -90,24 +89,18 @@ console.log(isSomeTrue([1, 2, 3, 4, 5], n => n > 20)) // вернет false
    - fn не является функцией (с текстом "fn is not a function")
  */
 function returnBadArguments(fn, ...args) {
-  try {
-    if (typeof fn !== 'function') {
-      throw new Error('fn is not a function');
-    }
+    isFunction(fn);
   
     let result = [];
   
-    for (let i = 1; i < arguments.length; i++) {
+    for (let i = 0; i < args.length; i++) {
         try {
-            fn(arguments[i]);
+            fn(args[i]);
         } catch (e) {
-            result.push(arguments[i]);
+            result.push(args[i]);
         }
     }
   return result;
-  } catch (e) {
-    console.log(e.message)
-  }
 }
 
 
@@ -129,75 +122,28 @@ function returnBadArguments(fn, ...args) {
    - какой-либо из аргументов div является нулем (с текстом "division by 0")
  */
 function calculator(number = 0) {
-  try {
-    if (typeof number !== 'number') {
-      throw new Error('number is not a number');
-    }
+    isNumber(number);
   
     let obj = {
   
-      sum() {
-        let result = number;
-              
-        for (let i = 0; i < arguments.length; i++) {
-          result += arguments[i];
-        }
-  
-        return result;
-      },
-  
-      dif() {
-        let result = number;
-              
-        for (let i = 0; i < arguments.length; i++) {
-          result += arguments[i];
-        }
-  
-        return result;
-      },
-
-      div() {
-        let result = number;
-
-        for (let i = 0; i < arguments.length; i++) {
-          try {
-            if (arguments[i] == 0) {
-              throw new Error('division by 0');
-            }
-          }catch(e) {
-            console.log(e.message);
+      sum: (...rest) => rest.reduce((prev,current) => prev + current, number),
+      dif: (...rest) => rest.reduce((prev,current) => prev - current, number),
+      div: (...rest) => 
+        rest.reduce((prev, current) => {
+          if (prev === 0 || current === 0){
+            throw Error('division by 0');
           }
-            
-            result = result / arguments[i];
-        }
 
-        return result;
-      },
-      
-      mul() {
-        let result = number;
-
-        for (let i = 0; i < arguments.length; i++) {
-          result = result * arguments[i];
-        }
-
-        return result;
-      }
+          return prev / current;
+        }, number),
+      mul: (...rest) => rest.reduce((prev,current) => prev * current, number),
 
     }
    
     return obj;
-  
-  } catch(e) {
-    console.log(e.message);
-  }
 }
 
-let calc = calculator('dd');
-
-let cal = calculator(23);
-console.log(cal.div(1, 3, 3))
 
 /* При решении задач, постарайтесь использовать отладчик */
 
-// export { isAllTrue, isSomeTrue, returnBadArguments, calculator };
+export { isAllTrue, isSomeTrue, returnBadArguments, calculator };
