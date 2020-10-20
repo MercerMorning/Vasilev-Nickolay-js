@@ -90,19 +90,24 @@ console.log(isSomeTrue([1, 2, 3, 4, 5], n => n > 20)) // вернет false
    - fn не является функцией (с текстом "fn is not a function")
  */
 function returnBadArguments(fn, ...args) {
-  if (typeof fn !== 'function') {
-    throw new Error('fn is not a function');
+  try {
+    if (typeof fn !== 'function') {
+      throw new Error('fn is not a function');
+    }
+  
+    let result = [];
+  
+    for (let i = 1; i < arguments.length; i++) {
+        try {
+            fn(arguments[i]);
+        } catch (e) {
+            result.push(arguments[i]);
+        }
+    }
+  } catch (e) {
+    console.log(e.message)
   }
-
-  let result = [];
-
-  for (let i = 1; i < arguments.length; i++) {
-      try {
-          fn(arguments[i]);
-      } catch (e) {
-          result.push(arguments[i]);
-      }
-  }
+  
 
   return result;
 }
