@@ -132,7 +132,7 @@ function deleteTextNodesRecursive(where) {
   }
 }
 
-deleteTextNodesRecursive(document.body)
+
 
 /*
  Задание 7 *:
@@ -179,7 +179,7 @@ function collectDOMStat(root) {
   return obj;
 }
 
-console.log(collectDOMStat(document.body));
+
 
 /*
  Задание 8 *:
@@ -214,7 +214,29 @@ console.log(collectDOMStat(document.body));
    }
  */
 function observeChildNodes(where, fn) {
+  let observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+
+            if (mutation.addedNodes) {
+                fn({
+                    type: 'insert',
+                    nodes: [... mutation.addedNodes]
+                });
+            }
+            if (mutation.removedNodes) {
+                fn({
+                    type: 'remove',
+                    nodes: [...mutation.removedNodes]
+                });
+            }
+        });
+    });
+
+    observer.observe(where, { childList: true, subtree: true });
 }
+
+observeChildNodes(document.body, (arg) => console.log(arg))
+
 
 // export {
 //   createDivWithText,
