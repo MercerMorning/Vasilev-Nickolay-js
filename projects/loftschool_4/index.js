@@ -218,16 +218,16 @@ function observeChildNodes(where, fn) {
         mutations.forEach(function(mutation) {
 
           if (mutation.addedNodes.length > 0) {
-            fn({
+            return fn({
                 type: 'insert',
                 nodes: [... mutation.addedNodes]
             });
           }
           if (mutation.removedNodes.length > 0) {
-              fn({
-                  type: 'remove',
-                  nodes: [...mutation.removedNodes]
-              });
+            return fn({
+              type: 'remove',
+              nodes: [...mutation.removedNodes]
+            });
           }
         });
     });
