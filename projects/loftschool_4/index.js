@@ -217,18 +217,18 @@ function observeChildNodes(where, fn) {
   let observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
 
-            if (mutation.addedNodes) {
-                fn({
-                    type: 'insert',
-                    nodes: [... mutation.addedNodes]
-                });
-            }
-            if (mutation.removedNodes) {
-                fn({
-                    type: 'remove',
-                    nodes: [...mutation.removedNodes]
-                });
-            }
+          if (mutation.addedNodes.length > 0) {
+            fn({
+                type: 'insert',
+                nodes: [... mutation.addedNodes]
+            });
+          }
+          if (mutation.removedNodes.length > 0) {
+              fn({
+                  type: 'remove',
+                  nodes: [...mutation.removedNodes]
+              });
+          }
         });
     });
 
@@ -238,13 +238,13 @@ function observeChildNodes(where, fn) {
 observeChildNodes(document.body, (arg) => console.log(arg))
 
 
-// export {
-//   createDivWithText,
-//   prepend,
-//   findAllPSiblings,
-//   findError,
-//   deleteTextNodes,
-//   deleteTextNodesRecursive,
-//   collectDOMStat,
-//   observeChildNodes,
-// };
+export {
+  createDivWithText,
+  prepend,
+  findAllPSiblings,
+  findError,
+  deleteTextNodes,
+  deleteTextNodesRecursive,
+  collectDOMStat,
+  observeChildNodes,
+};
