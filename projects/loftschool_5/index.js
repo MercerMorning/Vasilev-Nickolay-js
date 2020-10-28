@@ -85,7 +85,7 @@ retryButton.addEventListener('click', () => {
 filterInput.addEventListener('input', function (e) {
   filterResult.innerHTML = '<div id="loading-block">Загрузка...</div>';
   let symb = this.value;
-  console.log(loadTowns().then( function (resolve) {
+  loadTowns().then( function (resolve) {
       filterResult.innerHTML = resolve
       .filter(element => isMatching(element.name, symb))
       .map(element => element.name)
@@ -95,7 +95,7 @@ filterInput.addEventListener('input', function (e) {
     loadingFailedBlock.style.display = 'block';
     filterResult.innerHTML = '';
     return reject;
-  }));
+  });
   
 });
 
