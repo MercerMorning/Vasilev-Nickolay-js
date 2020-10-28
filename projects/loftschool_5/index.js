@@ -40,21 +40,23 @@ const homeworkContainer = document.querySelector('#homework-container');
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
  */
 function loadTowns() {
+  // return fetch('https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json')
+  // return fetch('https://raw.githubusercontent.com/smfelukov/citiesTest/master/cities.json')
+  // .then(response => response.json())
+  //   .then(response => response.sort((a, b) => a.name > b.name ? 1 : -1));
   return new Promise( (resolve, reject) => {
     let xhr = new XMLHttpRequest();
-  
-    xhr.open('GET', 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json', false);
-    xhr.send();
-
-    if (xhr.status >= 400) {
-      reject(xhr.response);
-    } else {
-      resolve(JSON.parse(xhr.responseText).map((currentValue) => currentValue['name']))
+    try {
+      xhr.open('GET', 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json', false);
+      xhr.send();
+      resolve(JSON.parse(xhr.responseText));
+    } catch (e) {
+      resolve('error');
     }
   })
 }
 
-loadTowns()
+
 /*
  Функция должна проверять встречается ли подстрока chunk в строке full
  Проверка должна происходить без учета регистра символов
@@ -67,11 +69,14 @@ loadTowns()
    isMatching('Moscow', 'Moscov') // false
  */
 function isMatching(full, chunk) {
-  return full.indexOf(chunk)
+  if (full.toUpperCase().indexOf(chunk.toUpperCase()) >= 0) {
+    return true;
+  }
+  return false;
 }
 
 /* Блок с надписью "Загрузка" */
-const loadingBlock = homeworkContainer.querySelector('#loading-block');
+// const loadingBlock = homeworkContainer.querySelector('#loading-block');
 /* Блок с надписью "Не удалось загрузить города" и кнопкой "Повторить" */
 const loadingFailedBlock = homeworkContainer.querySelector('#loading-failed');
 /* Кнопка "Повторить" */
@@ -84,10 +89,34 @@ const filterInput = homeworkContainer.querySelector('#filter-input');
 const filterResult = homeworkContainer.querySelector('#filter-result');
 
 retryButton.addEventListener('click', () => {
+  loadingFailedBlock.style.display = 'none';
+  
 });
 
-filterInput.addEventListener('input', function () {
+filterInput.addEventListener('input', function (e) {
+  filterResult.innerHTML = '<div id="loading-block">Загрузка...</div>';
+  let symb = this.value;
+  loadTowns().then( function (resolve)  {    
+    if (resolve == 'error') {
+      loadingFailedBlock.style.display = 'block';
+      filterResult.innerHTML = '';
+      return resolve;
+    } else {
+      filterResult.innerHTML = resolve
+      .filter(element => isMatching(element.name, symb))
+      .map(element => element.name)
+      .join('<br>');
+    };
+    // if (filterResult.innerHTML = resolve.filter(element => isMatching(element.name, symb)).map(element => element.name).join('<br>')) {
+    //   return resolve;
+    // } else {
+    //   return 'нет совпадений';
+    // }
+  });
+  
 });
+
+
 
 loadingFailedBlock.classList.add('hidden');
 filterBlock.classList.add('hidden');
