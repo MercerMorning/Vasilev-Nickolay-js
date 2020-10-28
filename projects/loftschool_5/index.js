@@ -40,20 +40,9 @@ const homeworkContainer = document.querySelector('#homework-container');
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
  */
 function loadTowns() {
-  // return fetch('https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json')
-  // return fetch('https://raw.githubusercontent.com/smfelukov/citiesTest/master/cities.json')
-  // .then(response => response.json())
-  //   .then(response => response.sort((a, b) => a.name > b.name ? 1 : -1));
-  return new Promise( (resolve, reject) => {
-    let xhr = new XMLHttpRequest();
-    try {
-      xhr.open('GET', 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json', false);
-      xhr.send();
-      resolve(JSON.parse(xhr.responseText));
-    } catch (e) {
-      resolve('error');
-    }
-  })
+  return fetch('https://raw.githubusercontent.com/smfelukov/citiesTest/master/cities.json')
+  .then(response => response.json())
+    .then(response => response.sort((a, b) => a.name > b.name ? 1 : -1));
 }
 
 
@@ -96,23 +85,22 @@ retryButton.addEventListener('click', () => {
 filterInput.addEventListener('input', function (e) {
   filterResult.innerHTML = '<div id="loading-block">Загрузка...</div>';
   let symb = this.value;
-  loadTowns().then( function (resolve)  {    
-    if (resolve == 'error') {
-      loadingFailedBlock.style.display = 'block';
-      filterResult.innerHTML = '';
-      return resolve;
-    } else {
+  console.log(loadTowns().then( function (resolve) {
       filterResult.innerHTML = resolve
       .filter(element => isMatching(element.name, symb))
       .map(element => element.name)
       .join('<br>');
-    };
+    ;
     // if (filterResult.innerHTML = resolve.filter(element => isMatching(element.name, symb)).map(element => element.name).join('<br>')) {
     //   return resolve;
     // } else {
     //   return 'нет совпадений';
     // }
-  });
+  }, function (reject) {
+    loadingFailedBlock.style.display = 'block';
+    filterResult.innerHTML = '';
+    return reject;
+  }));
   
 });
 
