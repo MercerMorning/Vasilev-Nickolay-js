@@ -40,7 +40,7 @@ const homeworkContainer = document.querySelector('#homework-container');
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
  */
 function loadTowns() {
-  return fetch('https://raw.githubusercontent.com/smfelukov/citiesTest/master/cities.json')
+  return fetch('https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json')
   .then(response => response.json())
     .then(response => response.sort((a, b) => a.name > b.name ? 1 : -1));
 }
@@ -91,11 +91,6 @@ filterInput.addEventListener('input', function (e) {
       .map(element => element.name)
       .join('<br>');
     ;
-    // if (filterResult.innerHTML = resolve.filter(element => isMatching(element.name, symb)).map(element => element.name).join('<br>')) {
-    //   return resolve;
-    // } else {
-    //   return 'нет совпадений';
-    // }
   }, function (reject) {
     loadingFailedBlock.style.display = 'block';
     filterResult.innerHTML = '';
