@@ -29,7 +29,7 @@
    homeworkContainer.appendChild(newDiv);
  */
 
-// import './towns.html';
+import './towns.html';
 
 const homeworkContainer = document.querySelector('#homework-container');
 
@@ -65,7 +65,7 @@ function isMatching(full, chunk) {
 }
 
 /* Блок с надписью "Загрузка" */
-// const loadingBlock = homeworkContainer.querySelector('#loading-block');
+const loadingBlock = homeworkContainer.querySelector('#loading-block');
 /* Блок с надписью "Не удалось загрузить города" и кнопкой "Повторить" */
 const loadingFailedBlock = homeworkContainer.querySelector('#loading-failed');
 /* Кнопка "Повторить" */
@@ -77,31 +77,45 @@ const filterInput = homeworkContainer.querySelector('#filter-input');
 /* Блок с результатами поиска */
 const filterResult = homeworkContainer.querySelector('#filter-result');
 
+let towns = [];
+
+function getTowns() {
+  loadingBlock.classList.add('hidden');
+
+  loadTowns()
+    .then(data => {
+      towns = data;
+      loadingBlock.classList.add('hidden');
+      loadingFailedBlock.classList.add('hidden');
+      filterBlock.classList.remove('hidden');
+    })
+    .catch(error => {
+      loadingBlock.classList.add('hidden');
+      loadingFailedBlock.classList.remove('hidden');
+    })
+}
+
 retryButton.addEventListener('click', () => {
-  loadingFailedBlock.style.display = 'none';
-  
+  getTowns();
 });
 
 filterInput.addEventListener('input', function (e) {
-  filterResult.innerHTML = '<div id="loading-block">Загрузка...</div>';
   let symb = this.value;
-  loadTowns().then( function (resolve) {
-      filterResult.innerHTML = resolve
-      .filter(element => isMatching(element.name, symb))
-      .map(element => element.name)
-      .join('<br>');
-    ;
-  }, function (reject) {
-    loadingFailedBlock.style.display = 'block';
+  if (!e.target.value) {
     filterResult.innerHTML = '';
-    return reject;
-  });
-  
+  } else {
+    filterResult.innerHTML = towns
+    .filter(element => isMatching(element.name, symb))
+    .map(element => '<div>' + element.name + '</div>')
+    .join('');
+  }
 });
 
 
 
 loadingFailedBlock.classList.add('hidden');
 filterBlock.classList.add('hidden');
+
+getTowns()
 
 export { loadTowns, isMatching };
