@@ -70,7 +70,7 @@ function emulateClick(target) {
  */
 function delegate(target, fn) {
   target.addEventListener('click', (e) => {
-    if (e.target.tagName == 'BUTTON'  && event.target.parentNode === target) {
+    if (e.target.tagName == 'BUTTON'  && e.target.parentNode === target) {
       fn(e);
     } 
   });
@@ -96,7 +96,7 @@ function once(target, fn) {
     }
 }
 
-once(document.querySelector('button'), () => console.log('обработчик выполнился!')) 
+// once(document.querySelector('button'), () => console.log('обработчик выполнился!')) 
 
 
 export { addListener, removeListener, skipDefault, emulateClick, delegate, once };
