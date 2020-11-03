@@ -46,13 +46,11 @@ const addButton = homeworkContainer.querySelector('#add-button');
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
 function createCookie(name, value) {
-  let chunk = filterNameInput.value;
-
   if (name === '' || value === '') {
-      return;
+    return;
   }
-
   document.cookie = `${name}=${value}`;
+  let chunk = filterNameInput.value;
   if (isMatching(name, chunk)) makeTable([name, value])
 }
 
@@ -67,7 +65,7 @@ function isMatching(full, chunk) {
 function showCookie() {
   listTable.innerHTML = '';
   let chunk = filterNameInput.value;
-  let cookies = getCookies();// положить сюда все куки
+  let cookies = getCookies();
   for (let cookie of cookies) {
     if (isMatching(cookie[0], chunk)) { 
       makeTable(cookie);
@@ -88,23 +86,18 @@ function makeTable(cookie) {
     del.innerHTML = 'удалить'
     nodeRow.append(del);
     fragment.append(nodeRow)
-  listTable.append(fragment)
+    listTable.append(fragment)
 }
 
 function getCookies() {
-  let cookies = document.cookie.split(';');
-  cookies = cookies.map((element) => element.split('=') )
-  return cookies;
-
+  return document.cookie.split(';').map((element) => element.split('='))
 }
 
 
 listTable.addEventListener('click', (e) => {
   if (e.target.className == 'del-button') {
     let cookieName = e.target.closest('tr').firstChild.innerText
-    var cookie_date = new Date ( );
-    cookie_date.setTime ( cookie_date.getTime() - 1 );
-    document.cookie = `${cookieName}='';expires=-1` + cookie_date.toGMTString();
+    document.cookie = `${cookieName}="";expires=${new Date(0).toUTCString()}`;
     e.target.closest('tr').remove()
   }
 });
