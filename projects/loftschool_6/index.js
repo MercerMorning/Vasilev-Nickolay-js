@@ -45,9 +45,60 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
+function createCookie(name, value) {
+  if (name === '' || value === '') {
+      return;
+  }
+
+  document.cookie = `${name}=${value}`;
+}
+
+function isMatching(full, chunk) {
+  if (full.toLowerCase().includes(chunk.toLowerCase())) {
+      return true;
+  }
+
+  return false;    
+}
+
+function showCookie() {
+  listTable.innerHTML = '';
+  let chunk = filterNameInput.value;
+  let cookies = getCookies();// положить сюда все куки
+  for (let cookie of cookies) {
+    if (isMatching(cookie[0], chunk)) { 
+      makeTable(cookie);
+    }
+  }
+}
+showCookie()
+
+function makeTable(cookie) {
+  let fragment = document.createDocumentFragment();
+  let nodeRow = document.createElement('tr');
+  for (let prop of cookie) { 
+    let nodeEl = document.createElement('th');
+    nodeEl.innerHTML = prop;
+    nodeRow.append(nodeEl);
+  }
+    let del = document.createElement('th');
+    del.classList.add('del-button');
+    del.innerHTML = 'удалить'
+    nodeRow.append(del);
+    fragment.append(nodeRow)
+  listTable.append(fragment)
+}
+
+function getCookies() {
+  let cookies = document.cookie.split(';');
+  cookies = cookies.map((element) => element.split('=') )
+  return cookies;
+
+}
+
+
 listTable.addEventListener('click', (e) => {
   if (e.target.className == 'del-button') {
-    
     let cookieName = e.target.closest('tr').firstChild.innerText
     var cookie_date = new Date ( );
     cookie_date.setTime ( cookie_date.getTime() - 1 );
@@ -56,41 +107,9 @@ listTable.addEventListener('click', (e) => {
 });
 
 filterNameInput.addEventListener('input', function () {
+  showCookie();
 });
 
 addButton.addEventListener('click', () => {
-  document.cookie = `${addNameInput.value}=${addValueInput.value}`
-});
-
-let cookies = document.cookie.split(';');
-
-cookies = cookies.map(function (current) {
-  if(current.split('=').length == 2) {
-    return current.split('=');
-  }
-  return ['',current];
-    
-}); 
-  
-console.log(cookies)
-
-let fragment = document.createDocumentFragment();
-
-for (let cookie of cookies) {
-  let nodeRow = document.createElement('tr');
-  cookie.forEach(element => {
-    let nodeEl = document.createElement('th');
-    nodeEl.innerHTML = element;
-    nodeRow.append(nodeEl);
-  });
-  let del = document.createElement('th');
-  del.classList.add('del-button');
-  del.innerHTML = 'удалить'
-  nodeRow.append(del);
-  fragment.append(nodeRow)
-}
-
-listTable.append(fragment)
-
-listTable.addEventListener('click', (e) => {
+  createCookie(addNameInput.value, addValueInput.value);
 });
