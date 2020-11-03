@@ -46,11 +46,14 @@ const addButton = homeworkContainer.querySelector('#add-button');
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
 function createCookie(name, value) {
+  let chunk = filterNameInput.value;
+
   if (name === '' || value === '') {
       return;
   }
 
   document.cookie = `${name}=${value}`;
+  if (isMatching(name, chunk)) makeTable([name, value])
 }
 
 function isMatching(full, chunk) {
@@ -71,7 +74,6 @@ function showCookie() {
     }
   }
 }
-showCookie()
 
 function makeTable(cookie) {
   let fragment = document.createDocumentFragment();
@@ -103,6 +105,7 @@ listTable.addEventListener('click', (e) => {
     var cookie_date = new Date ( );
     cookie_date.setTime ( cookie_date.getTime() - 1 );
     document.cookie = `${cookieName}='';expires=-1` + cookie_date.toGMTString();
+    e.target.closest('tr').remove()
   }
 });
 
@@ -113,3 +116,5 @@ filterNameInput.addEventListener('input', function () {
 addButton.addEventListener('click', () => {
   createCookie(addNameInput.value, addValueInput.value);
 });
+
+showCookie();
