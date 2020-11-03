@@ -50,8 +50,12 @@ function createCookie(name, value) {
     return;
   }
   document.cookie = `${name}=${value}`;
+  addNameInput.value = '';
+  addValueInput.value = '';
+
   let chunk = filterNameInput.value;
-  if (isMatching(name, chunk)) makeTable([name, value])
+  // if (isMatching(name, chunk)) makeTable([name, value])
+  if (isMatching(name, chunk)) showCookie()
 }
 
 function isMatching(full, chunk) {
@@ -67,7 +71,7 @@ function showCookie() {
   let chunk = filterNameInput.value;
   let cookies = getCookies();
   for (let cookie of cookies) {
-    if (isMatching(cookie[0], chunk)) { 
+    if (cookie && isMatching(cookie[0], chunk)) { 
       makeTable(cookie);
     }
   }
@@ -90,7 +94,10 @@ function makeTable(cookie) {
 }
 
 function getCookies() {
-  return document.cookie.split(';').map((element) => element.split('='))
+  return document.cookie.split(';').map((element) => { 
+    if (element != '') return element.split('=');
+    else return; 
+  })
 }
 
 
