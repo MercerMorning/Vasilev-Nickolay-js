@@ -74,7 +74,7 @@ function showCookie() {
   listTable.innerHTML = '';
 
   for (let cookie of cookies) {
-    if (cookie && isMatching(cookie[0], chunk)) { 
+    if (isMatching(cookie[0], chunk) || isMatching(cookie[1], chunk)){
       makeTable(cookie);
     }
   }
