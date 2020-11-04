@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet">
         <script src="https://api-maps.yandex.ru/2.1/?apikey=4040c59a-ba5a-403b-8e3a-7b3a6ac9f8a9&lang=ru_RU" type="text/javascript">
         </script>
     </head>
@@ -9,4 +10,73 @@
         <div id="map" style="width: 100%; height: 100vh"></div>
     </body>
     <script src="index.js"></script>
+    <style>
+        body {
+            font-family: "Arial";
+        }
+
+        .balloonContainer {
+            width: 400px;
+            background-color: rgb(255, 255, 255);
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .balloonHeader {
+            border-radius: 10px 10px 0px 0px;
+            padding: 5px 10px;
+            color: white;
+            font-size: 12px;
+            background-color: rgb(255, 134, 99);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;            
+        }
+
+        .close-btn {
+            font-size: 12px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .balloonContent {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .balloonContent h3 {
+            text-transform: uppercase;
+            color:  rgb(255, 134, 99);
+        }
+
+        .balloonContent input {
+            width: 97%;
+            margin: 5px 0;
+            border-radius: 27px;
+            padding: 5px;
+            border: 2px solid gray;
+        }
+
+        .balloonFooter {
+            padding: 5px 10px;
+            font-size: 12px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .addButton {
+            background-color: rgb(255, 134, 99);
+            border-radius: 10px;
+            border: none;
+            color: white;
+            padding: 10px;
+        }
+
+        .address::before {
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900; 
+            content: "\f3c5";
+            margin-right: 5px;
+        }
+    </style>
 </html>
