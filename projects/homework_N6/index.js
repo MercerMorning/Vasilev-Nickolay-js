@@ -21,12 +21,29 @@ const homeworkContainer = document.querySelector('#app');
 
 document.addEventListener('mousemove', (e) => {
   if (e.target.classList.contains('draggable-div')) {
-    let div = e.target;
-    e.target.addEventListener('dragover', (e) => {
-      div.style.left = e.pageX - div.offsetWidth / 2 + 'px';
-      div.style.top = e.pageY - div.offsetHeight / 2 + 'px';
-    });
+    e.target.onmousedown = function (e) {
+
+      let target = e.target;
+      move(e);
+      
+      target.style.zIndex = 100;
+    
+      function move(e) {
+          target.style.left = e.pageX - target.offsetWidth/2 +'px';
+          target.style.top = e.pageY - target.offsetHeight/2 +'px';
+      }
+    
+      document.onmousemove = function(e) {
+          move(e);
+      }
+    
+      target.onmouseup = function() {
+          document.onmousemove = null;
+          target.onmouseup = null;
+      }
+    }
   }
+  
 });
 
 export function createDiv() {
