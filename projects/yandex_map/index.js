@@ -10,6 +10,43 @@
             behaviors: ['drag']
         });
         
+        var storage = localStorage;
+
+        var myBalloonLayout = ymaps.templateLayoutFactory.createClass(
+            `<div class="balloonContainer">
+            <div class="balloonHeader"> 
+            <p class="address">
+            {% if contentHeader %}
+                $[contentHeader]
+            {% else %}
+                $[properties.address]
+            {% endif %}
+            </p><i class="fas fa-times close-btn"></i>
+            </div>
+            <div class="balloonContent">
+            <div class="comments">
+                {% if properties.comments %} 
+                {% for comment in properties.comments %}
+                    <b>{{ comment.author }}</b>
+                    <span>{{ comment.place }}</span>
+                    <p>{{ comment.desc }}</p>
+                {% endfor %}
+                {% else %} 
+                    нет комментириев 
+                {% endif %}
+            </div>
+            <h3>Ваш отзыв</h3>
+            <input type="text" id='inputName' placeholder="Ваше имя">
+            <input type="text" id='inputPlace' placeholder="Укажите место">
+            <input type="text" id='inputDesc' placeholder="Поделитесь впечатлениями">
+            </div>
+            <div class="balloonFooter">
+                <button class="add-btn">Добавить</button>
+            </div>
+            </div>`
+        );
+
+        ymaps.layout.storage.add('my#layout', myBalloonLayout);
 
         myMap.events.add('click', async function (e) {
             if (!myMap.balloon.isOpen()) {
@@ -20,9 +57,9 @@
                     (res) => {
                         if (res.geoObjects.getLength()) {
                             // var point = res.geoObjects.get(0);
-                            console.log(res.geoObjects.get(0).properties.getAll())
+                            // console.log(res.geoObjects.get(0).properties.getAll())
                             address = res.geoObjects.get(0).properties.get('name');
-                            console.log(address)
+                            // console.log(address)
                             // myMap.panTo(point.geometry.getCoordinates());
                         }
                     },
@@ -43,58 +80,156 @@
                 //     '<button>close</button>'
                 // );
 
-                var myBalloonLayout = ymaps.templateLayoutFactory.createClass(
-                    `<div class="balloonContainer">
-                    <div class="balloonHeader"> 
-                    <p class="address">${address}</p><i class="fas fa-times close-btn"></i>
-                    </div>
-                    <div class="balloonContent">
-                    <h3>Ваш отзыв</h3>
-                    <input type="text" placeholder="Ваше имя">
-                    <input type="text" placeholder="Укажите место">
-                    <input type="text" placeholder="Поделитесь впечатлениями">
-                    </div>
-                    <div class="balloonFooter">
-                        <button class="addButton">Добавить</button>
-                    </div>
-                    </div>`
-                );
-     
-                ymaps.layout.storage.add('my#layout', myBalloonLayout);
+               
                 // ymaps.layout.storage.add('my#contentlayout', myBalloonContentLayout);
                 // ymaps.layout.storage.add('my#contentCloselayout', myBalloonCloseLayout);
-                
+
                 await myMap.balloon.open(coords, {
-                    layout: 'my#contentlayout',
-                    contentHeader:address,
-                    contentBody: [
-                        '<input type="text" placeholder="Укажите ваше имя">',
-                        '<br>',
-                        '<input type="text" placeholder="Укажите место">',
-                        '<br>',
-                        '<textarea placeholder="Оставьте отзыв"></textarea>'
-                    ].join(''),
-                    contentFooter:'<button>Добавить</button>'
+                    contentHeader: address,
                 },
                 { 
                     layout: 'my#layout',
+                    address: address,
                     // contentLayout: 'my#contentlayout',
                     // closeButtonLayout:  'my#contentCloselayout',
                 },
                 );
 
+                
+                var addBtn = document.body.querySelector('.add-btn');
                 var closeBtn = document.body.querySelector('.close-btn');
+                var inputName = document.body.querySelector('#inputName ');
+                var inputPlace = document.body.querySelector('#inputPlace');
+                var inputDesc = document.body.querySelector('#inputDesc');
+                
+                // storage.clear()
+
+                addBtn.onclick = function () {
+                
+                    if (inputName.value && inputPlace.value && inputDesc.value) {
+                        let storageContent = storage.data ? JSON.parse(storage.data) : [];
+                        storageContent.push({
+                            coords: coords,
+                            commentatorName: inputName.value,
+                            place: inputPlace.value,
+                            desc: inputDesc.value,
+                        });
+                        storage.data = JSON.stringify(storageContent)
+                        closeBtn.click();
+                        newMarker(coords)
+                    }
+                }
+
                 closeBtn.onclick = function () {
                     myMap.balloon.close()
                 }
 
-               
             }
             else {
                 myMap.balloon.close();
             }
+
+          
         });
+
+
+        //   myMap.panTo(point.geometry.getCoordinates());
+          let storageList = JSON.parse(storage.data);
+
+          let markers = []
+
+          for (item of storageList) {
+
+            if (markers.find( (element) => {
+                return element.coords === item.coords;
+            })) {
+                markers.find( (element) => {
+                    return element.coords === item.coords;
+                }).comment.push(
+                    {
+                        author: item.commentatorName,
+                        place: item.place,
+                        desc: item.desc,
+                    }
+                );
+            }
+              markers.push({
+                coords: item.coords,
+                comment: [{
+                    author: item.commentatorName,
+                    place: item.place,
+                    desc: item.desc,
+                }]
+              });
+            
+          }
+
+          for (let marker of markers) {
+            newMarker(marker.coords, marker.comment)
+          }
+
+        //   console.log(markers)
+        //   console.log(storageList)
+
+        async function newMarker(coords, comments = []) {
+            var geocoder = new ymaps.geocode(coords, {results: 1});
+                var address;
+                await geocoder.then(
+                    (res) => {
+                        if (res.geoObjects.getLength()) {
+                            address = res.geoObjects.get(0).properties.get('name');
+                            // console.log(address)
+                        }
+                    },
+                    function (error) {
+                    alert("Возникла ошибка: " + error.message);
+                    }
+                )
+            console.log(comments)
+            let placemark =  new ymaps.Placemark(coords,
+                {
+                    address: address,
+                    comments: comments,
+                },
+                {
+                    balloonLayout: 'my#layout',
+                }
+            )
+            placemark.events.add('balloonopen',  function (e) { 
+                var addBtn = document.body.querySelector('.add-btn');
+                var closeBtn = document.body.querySelector('.close-btn');
+                var inputName = document.body.querySelector('#inputName ');
+                var inputPlace = document.body.querySelector('#inputPlace');
+                var inputDesc = document.body.querySelector('#inputDesc');
+                
+                // storage.clear()
+
+                addBtn.onclick = function () {
+                
+                    if (inputName.value && inputPlace.value && inputDesc.value) {
+                        let storageContent = storage.data ? JSON.parse(storage.data) : [];
+                        storageContent.push({
+                            coords: coords,
+                            commentatorName: inputName.value,
+                            place: inputPlace.value,
+                            desc: inputDesc.value,
+                        });
+                        storage.data = JSON.stringify(storageContent)
+                        closeBtn.click();
+                        newMarker(coords)
+                    }
+                }
+
+                closeBtn.onclick = function () {
+                    myMap.balloon.close()
+                }
+             })
+            myMap.geoObjects.add(placemark);
+        }
+        
     }
+
+    
 
    
     // document.body.onmousemove = (e) => console.log(e)
