@@ -139,12 +139,11 @@
           let markers = []
 
           for (item of storageList) {
-
             if (markers.find( (element) => {
-                return element.coords === item.coords;
+                return element.coords.join('') === item.coords.join('');
             })) {
                 markers.find( (element) => {
-                    return element.coords === item.coords;
+                    return element.coords.join('') === item.coords.join('');
                 }).comment.push(
                     {
                         author: item.commentatorName,
@@ -153,6 +152,7 @@
                     }
                 );
             }
+            else {
               markers.push({
                 coords: item.coords,
                 comment: [{
@@ -161,10 +161,11 @@
                     desc: item.desc,
                 }]
               });
-            
+            }
           }
 
           for (let marker of markers) {
+            // console.log(marker)
             newMarker(marker.coords, marker.comment)
           }
 
@@ -185,7 +186,7 @@
                     alert("Возникла ошибка: " + error.message);
                     }
                 )
-            console.log(comments)
+            // console.log(comments)
             let placemark =  new ymaps.Placemark(coords,
                 {
                     address: address,
@@ -216,7 +217,7 @@
                         });
                         storage.data = JSON.stringify(storageContent)
                         closeBtn.click();
-                        newMarker(coords)
+                        newMarker(coords, )
                     }
                 }
 
