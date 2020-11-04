@@ -46,30 +46,33 @@ const addButton = homeworkContainer.querySelector('#add-button');
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
 function createCookie(name, value) {
-  if (name === '' || value === '') {
-    return;
-  }
-  document.cookie = `${name}=${value}`;
-  addNameInput.value = '';
-  addValueInput.value = '';
-
   let chunk = filterNameInput.value;
-  // if (isMatching(name, chunk)) makeTable([name, value])
-  if (isMatching(name, chunk)) showCookie()
+  let currentDate = new Date();
+
+  currentDate.setDate(currentDate.getDate() + 1);
+
+  document.cookie = `${name}=${value};expires=${currentDate}`;
+
+  setTimeout(() => {
+    addNameInput.value = '';
+    addValueInput.value = '';
+  }, 0);
+
+  if (isMatching(name, chunk) || isMatching(value, chunk)) { 
+    showCookie()
+  };
 }
 
 function isMatching(full, chunk) {
-  if (full.toLowerCase().includes(chunk.toLowerCase())) {
-      return true;
-  }
-
-  return false;    
+  return full.toLowerCase().includes(chunk.toLowerCase());
 }
 
 function showCookie() {
-  listTable.innerHTML = '';
   let chunk = filterNameInput.value;
   let cookies = getCookies();
+
+  listTable.innerHTML = '';
+
   for (let cookie of cookies) {
     if (cookie && isMatching(cookie[0], chunk)) { 
       makeTable(cookie);
@@ -80,31 +83,32 @@ function showCookie() {
 function makeTable(cookie) {
   let fragment = document.createDocumentFragment();
   let nodeRow = document.createElement('tr');
+  let del = document.createElement('td');
+
   for (let prop of cookie) { 
-    let nodeEl = document.createElement('th');
+    let nodeEl = document.createElement('td');
     nodeEl.innerHTML = prop;
     nodeRow.append(nodeEl);
   }
-    let del = document.createElement('th');
-    del.classList.add('del-button');
-    del.innerHTML = 'удалить'
-    nodeRow.append(del);
-    fragment.append(nodeRow)
-    listTable.append(fragment)
+    
+  del.innerHTML = `<button class="del-button" data-delete="${cookie[0]}">удалить</button>`
+  
+  nodeRow.append(del);
+  fragment.append(nodeRow)
+  listTable.append(fragment)
 }
 
 function getCookies() {
-  return document.cookie.split(';').map((element) => { 
-    if (element != '') return element.split('=');
-    else return; 
-  })
+  if (!document.cookie) {
+    return [];
+  }
+  return document.cookie.split(';').map((element) => element.split('='))
 }
 
 
 listTable.addEventListener('click', (e) => {
   if (e.target.className == 'del-button') {
-    let cookieName = e.target.closest('tr').firstChild.innerText
-    document.cookie = `${cookieName}="";expires=${new Date(0).toUTCString()}`;
+    document.cookie = `${e.target.dataset.delete}="";expires=${new Date(0).toUTCString()}`;
     e.target.closest('tr').remove()
   }
 });
@@ -114,7 +118,10 @@ filterNameInput.addEventListener('input', function () {
 });
 
 addButton.addEventListener('click', () => {
-  createCookie(addNameInput.value, addValueInput.value);
+  if (addNameInput.value !== '' || addValueInput.value !== '') {
+    createCookie(addNameInput.value, addValueInput.value);
+  }
+  
 });
 
 showCookie();
