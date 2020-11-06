@@ -163,19 +163,20 @@
               });
             }
           }
-
+          let placemarks = [];
           for (let marker of markers) {
             // console.log(marker)
-            newMarker(marker.coords, marker.comment)
+            placemarks.push(newMarker(marker.coords, marker.comment));
+            // myMap.geoObjects.add(newMarker(marker.coords, marker.comment))
           }
-
+        //   myMap.geoObjects.add(placemarks)
         //   console.log(markers)
         //   console.log(storageList)
-
-        async function newMarker(coords, comments = []) {
+        
+         function newMarker(coords, comments = []) {
             var geocoder = new ymaps.geocode(coords, {results: 1});
                 var address;
-                await geocoder.then(
+                geocoder.then(
                     (res) => {
                         if (res.geoObjects.getLength()) {
                             address = res.geoObjects.get(0).properties.get('name');
@@ -186,7 +187,6 @@
                     alert("Возникла ошибка: " + error.message);
                     }
                 )
-            // console.log(comments)
             let placemark =  new ymaps.Placemark(coords,
                 {
                     address: address,
@@ -225,9 +225,20 @@
                     myMap.balloon.close()
                 }
              })
-            myMap.geoObjects.add(placemark);
+             return placemark;
+            // myMap.geoObjects.add(placemark);
         }
-        
+
+        var clusterer = new ymaps.Clusterer({
+
+        });
+        // for (let placemark in placemarks) {
+        //     console.log(placema)
+        // }
+        console.log(placemarks)
+
+        myMap.geoObjects.add(clusterer)
+        clusterer.add(placemarks)
     }
 
     
