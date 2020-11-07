@@ -229,16 +229,38 @@
             // myMap.geoObjects.add(placemark);
         }
 
-        var clusterer = new ymaps.Clusterer({
+        var customBalloonContentLayout = ymaps.templateLayoutFactory.createClass([
+            '<ul class=list>',
+            // Выводим в цикле список всех геообъектов.
+            '{% for geoObject in properties.geoObjects %}',
+                '<li>', 
+                    '<a href=# data-placemarkid="{{ geoObject.properties.placemarkId }}" class="list_item">',
+                        '{{ geoObject }}',
+                    '</a>',
+                '</li>',
+            '{% endfor %}',
+            '</ul>'
+        ].join(''));
 
+        var clusterer = new ymaps.Clusterer({
+            clusterDisableClickZoom: true,
+            clusterOpenBalloonOnClick: true,
+            clusterBalloonContentLayout: customBalloonContentLayout
         });
         // for (let placemark in placemarks) {
         //     console.log(placema)
         // }
         console.log(placemarks)
 
+        
+
         myMap.geoObjects.add(clusterer)
         clusterer.add(placemarks)
+        // clusterer.events.add('balloonopen', function(e) {
+        //     e.preventDefault();
+        //     alert(123)
+        // });
+        // clusterer.balloon.open(clusterer.getClusters()[0]);
     }
 
     
