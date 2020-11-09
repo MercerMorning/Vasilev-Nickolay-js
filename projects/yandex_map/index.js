@@ -46,7 +46,6 @@
                 // newMarker(coords)
                 
                 fillMarkers();
-                clusterer.add(placemarks);
             }
         }
 
@@ -97,10 +96,10 @@
         }
     }
 
-    function newMarker(coords, comments = []) {
+    async function newMarker(coords, comments = []) {
         var geocoder = new ymaps.geocode(coords, {results: 1});
             var address;
-            geocoder.then(
+            await geocoder.then(
                 (res) => {
                     if (res.geoObjects.getLength()) {
                         address = res.geoObjects.get(0).properties.get('name');
@@ -124,7 +123,7 @@
             coords = placemark.geometry.getCoordinates();
             setButtons(coords);
         })
-        return placemark;
+        clusterer.add(placemark)
         // myMap.geoObjects.add(placemark);
     }
 
@@ -262,7 +261,7 @@
         fillMarkers()
         //   myMap.geoObjects.add(placemarks)
         
-        clusterer.add(placemarks)
+        // clusterer.add(placemarks)
         // clusterer.events.add('balloonopen', function(e) {
         //     e.preventDefault();
         //     alert(123)
