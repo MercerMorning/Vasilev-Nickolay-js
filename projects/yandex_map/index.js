@@ -196,7 +196,7 @@
                 },
                 { 
                     layout: 'my#layout',
-                    address: address,
+                    address: [address],
                 },
                 );
                 setButtons(coords);
@@ -211,32 +211,50 @@
         });
 
         var customBalloonContentLayout = ymaps.templateLayoutFactory.createClass([
-            '<ul class=list>',
             // Выводим в цикле список всех геообъектов.
-            '{% for geoObject in properties.geoObjects %}',
-                '<li>', 
-                    '<a href=# data-placemarkid="{{ geoObject.properties.placemarkId }}" class="list_item">',
-                        '{{ geoObject }}',
-                    '</a>',
-                '</li>',
-            '{% endfor %}',
-            '</ul>'
+            `{% for geoObject in properties.geoObjects %}
+                <div class="balloonContainer">
+                    <div class="balloonHeader"> 
+                        <p class="address">
+                            {{ geoObject.properties.address[0] }}
+                        </p>
+                        <i class="fas fa-times close-btn"></i>
+                    </div>
+                <div class="balloonContent">
+                    <div class="comments">
+                        {% if geoObject.properties.comments %} 
+                            {% for comment in geoObject.properties.comments %}
+                                <b>{{ comment.author }}</b>
+                                <span>{{ comment.place }}</span>
+                                <p>{{ comment.desc }}</p>
+                            {% endfor %}
+                        {% else %} 
+                            нет комментириев 
+                        {% endif %}
+                    </div>     
+                </div>
+            </div>
+            
+               
+            {% endfor %}`
+
+            
         ].join(''));
 
         clusterer = new ymaps.Clusterer({
             clusterDisableClickZoom: true,
             clusterOpenBalloonOnClick: true,
-            clusterBalloonContentLayout: customBalloonContentLayout
+            clusterBalloonLayout: customBalloonContentLayout
         });
-        // for (let placemark in placemarks) {
-        //     console.log(placema)
-        // }
+        for (let geoObject in myMap.geoObjects.properties) {
+            console.log(placemark)
+        }
 
         
 
         myMap.geoObjects.add(clusterer)
-
-
+        
+       
         //   myMap.panTo(point.geometry.getCoordinates());
 
         
