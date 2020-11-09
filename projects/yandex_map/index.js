@@ -215,7 +215,7 @@
                 <div class="balloonContainer">
                     <div class="balloonHeader"> 
                         <p class="address">
-                            {{ geoObject.properties.address[0] }}
+                            {{ geoObject.properties.address }}
                         </p>
                         <i class="fas fa-times close-btn"></i>
                     </div>
