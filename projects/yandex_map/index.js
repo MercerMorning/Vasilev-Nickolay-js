@@ -1,16 +1,143 @@
-  // Функция ymaps.ready() будет вызвана, когда
-    // загрузятся все компоненты API, а также когда будет готово DOM-дерево.
     ymaps.ready(init);
+     
+    window.addEventListener('storage', function(e) {  
+        console.log(e.key);
+      });
+
+    const storage = localStorage;
+
+    // storage.clear()
+
+    var myMap,
+        addBtn,
+        closeBtn,
+        inputName,
+        inputPlace,
+        inputDesc,
+        coords,
+        clusterer,
+        markers;
+
+    let placemarks = [];
+
+    function setButtons(coords) {
+        addBtn = document.body.querySelector('.add-btn')
+        closeBtn = document.body.querySelector('.close-btn')
+        inputName = document.body.querySelector('#inputName ')
+        inputPlace = document.body.querySelector('#inputPlace')
+        inputDesc = document.body.querySelector('#inputDesc')
+        
+        addBtn.onclick = function () {
+            
+            if (inputName.value && inputPlace.value && inputDesc.value) {
+                let storageContent = storage.data ? JSON.parse(storage.data) : [];
+                
+                storageContent.push({
+                    coords: coords,
+                    commentatorName: inputName.value,
+                    place: inputPlace.value,
+                    desc: inputDesc.value,
+                });
+                
+                console.log(storageContent)
+                storage.data = JSON.stringify(storageContent)
+                
+                closeBtn.click();
+                // newMarker(coords)
+                
+                fillMarkers();
+                clusterer.add(placemarks);
+            }
+        }
+
+        closeBtn.onclick = function () {
+            myMap.balloon.close()
+        }
+    }
+
+    let fillMarkers = () => {
+        let storageList = JSON.parse(storage.data);
+        
+        clusterer.removeAll();
+        placemarks = [];
+        console.log(placemarks)
+        markers = [];
+
+        for (item of storageList) {
+          if (markers.find( (element) => {
+              return element.coords.join('') === item.coords.join('');
+          })) {
+              markers.find( (element) => {
+                  return element.coords.join('') === item.coords.join('');
+              }).comment.push(
+                  {
+                      author: item.commentatorName,
+                      place: item.place,
+                      desc: item.desc,
+                  }
+              );
+          }
+          else {
+            markers.push({
+              coords: item.coords,
+              comment: [{
+                  author: item.commentatorName,
+                  place: item.place,
+                  desc: item.desc,
+              }]
+            });
+          }
+        }
+      
+      
+        for (let marker of markers) {
+          // console.log(marker)
+          placemarks.push(newMarker(marker.coords, marker.comment));
+          // myMap.geoObjects.add(newMarker(marker.coords, marker.comment))
+        }
+    }
+
+    function newMarker(coords, comments = []) {
+        var geocoder = new ymaps.geocode(coords, {results: 1});
+            var address;
+            geocoder.then(
+                (res) => {
+                    if (res.geoObjects.getLength()) {
+                        address = res.geoObjects.get(0).properties.get('name');
+                        // console.log(address)
+                    }
+                },
+                function (error) {
+                alert("Возникла ошибка: " + error.message);
+                }
+            )
+        let placemark =  new ymaps.Placemark(coords,
+            {
+                address: address,
+                comments: comments,
+            },
+            {
+                balloonLayout: 'my#layout',
+            }
+        )
+        placemark.events.add('balloonopen',  function (e) { 
+            coords = placemark.geometry.getCoordinates();
+            setButtons(coords);
+        })
+        return placemark;
+        // myMap.geoObjects.add(placemark);
+    }
+
     function init(){
         // Создание карты.
-        var myMap = new ymaps.Map("map", {
+        myMap = new ymaps.Map("map", {
             center: [55.76, 37.64],
             zoom: 7,
             controls: ['zoomControl'],
             behaviors: ['drag']
         });
         
-        var storage = localStorage;
+        
 
         var myBalloonLayout = ymaps.templateLayoutFactory.createClass(
             `<div class="balloonContainer">
@@ -50,39 +177,19 @@
 
         myMap.events.add('click', async function (e) {
             if (!myMap.balloon.isOpen()) {
-                var coords = e.get('coords');
+                coords = e.get('coords');
                 var geocoder = new ymaps.geocode(coords, {results: 1});
                 var address;
                 await geocoder.then(
                     (res) => {
                         if (res.geoObjects.getLength()) {
-                            // var point = res.geoObjects.get(0);
-                            // console.log(res.geoObjects.get(0).properties.getAll())
                             address = res.geoObjects.get(0).properties.get('name');
-                            // console.log(address)
-                            // myMap.panTo(point.geometry.getCoordinates());
                         }
                     },
                     function (error) {
-                    alert("Возникла ошибка: " + error.message);
+                        alert("Возникла ошибка: " + error.message);
                     }
                 )
-
-                // var myBalloonContentLayout = ymaps.templateLayoutFactory.createClass(
-                //     '<div class="myBalloon">' +
-                //     '<h3>$[contentHeader]</h3>' +
-                //     '<p><strong>Адрес:</strong> $[contentBody]</p>' +
-                //     '<button>Добавить</button>' +
-                //     '</div>'
-                // );
-
-                // var myBalloonCloseLayout = ymaps.templateLayoutFactory.createClass(
-                //     '<button>close</button>'
-                // );
-
-               
-                // ymaps.layout.storage.add('my#contentlayout', myBalloonContentLayout);
-                // ymaps.layout.storage.add('my#contentCloselayout', myBalloonCloseLayout);
 
                 await myMap.balloon.open(coords, {
                     contentHeader: address,
@@ -90,40 +197,11 @@
                 { 
                     layout: 'my#layout',
                     address: address,
-                    // contentLayout: 'my#contentlayout',
-                    // closeButtonLayout:  'my#contentCloselayout',
                 },
                 );
-
+                setButtons(coords);
                 
-                var addBtn = document.body.querySelector('.add-btn');
-                var closeBtn = document.body.querySelector('.close-btn');
-                var inputName = document.body.querySelector('#inputName ');
-                var inputPlace = document.body.querySelector('#inputPlace');
-                var inputDesc = document.body.querySelector('#inputDesc');
                 
-                // storage.clear()
-
-                addBtn.onclick = function () {
-                
-                    if (inputName.value && inputPlace.value && inputDesc.value) {
-                        let storageContent = storage.data ? JSON.parse(storage.data) : [];
-                        storageContent.push({
-                            coords: coords,
-                            commentatorName: inputName.value,
-                            place: inputPlace.value,
-                            desc: inputDesc.value,
-                        });
-                        storage.data = JSON.stringify(storageContent)
-                        closeBtn.click();
-                        newMarker(coords)
-                    }
-                }
-
-                closeBtn.onclick = function () {
-                    myMap.balloon.close()
-                }
-
             }
             else {
                 myMap.balloon.close();
@@ -131,103 +209,6 @@
 
           
         });
-
-
-        //   myMap.panTo(point.geometry.getCoordinates());
-          let storageList = JSON.parse(storage.data);
-
-          let markers = []
-
-          for (item of storageList) {
-            if (markers.find( (element) => {
-                return element.coords.join('') === item.coords.join('');
-            })) {
-                markers.find( (element) => {
-                    return element.coords.join('') === item.coords.join('');
-                }).comment.push(
-                    {
-                        author: item.commentatorName,
-                        place: item.place,
-                        desc: item.desc,
-                    }
-                );
-            }
-            else {
-              markers.push({
-                coords: item.coords,
-                comment: [{
-                    author: item.commentatorName,
-                    place: item.place,
-                    desc: item.desc,
-                }]
-              });
-            }
-          }
-          let placemarks = [];
-          for (let marker of markers) {
-            // console.log(marker)
-            placemarks.push(newMarker(marker.coords, marker.comment));
-            // myMap.geoObjects.add(newMarker(marker.coords, marker.comment))
-          }
-        //   myMap.geoObjects.add(placemarks)
-        //   console.log(markers)
-        //   console.log(storageList)
-        
-         function newMarker(coords, comments = []) {
-            var geocoder = new ymaps.geocode(coords, {results: 1});
-                var address;
-                geocoder.then(
-                    (res) => {
-                        if (res.geoObjects.getLength()) {
-                            address = res.geoObjects.get(0).properties.get('name');
-                            // console.log(address)
-                        }
-                    },
-                    function (error) {
-                    alert("Возникла ошибка: " + error.message);
-                    }
-                )
-            let placemark =  new ymaps.Placemark(coords,
-                {
-                    address: address,
-                    comments: comments,
-                },
-                {
-                    balloonLayout: 'my#layout',
-                }
-            )
-            placemark.events.add('balloonopen',  function (e) { 
-                var addBtn = document.body.querySelector('.add-btn');
-                var closeBtn = document.body.querySelector('.close-btn');
-                var inputName = document.body.querySelector('#inputName ');
-                var inputPlace = document.body.querySelector('#inputPlace');
-                var inputDesc = document.body.querySelector('#inputDesc');
-                
-                // storage.clear()
-
-                addBtn.onclick = function () {
-                
-                    if (inputName.value && inputPlace.value && inputDesc.value) {
-                        let storageContent = storage.data ? JSON.parse(storage.data) : [];
-                        storageContent.push({
-                            coords: coords,
-                            commentatorName: inputName.value,
-                            place: inputPlace.value,
-                            desc: inputDesc.value,
-                        });
-                        storage.data = JSON.stringify(storageContent)
-                        closeBtn.click();
-                        newMarker(coords, )
-                    }
-                }
-
-                closeBtn.onclick = function () {
-                    myMap.balloon.close()
-                }
-             })
-             return placemark;
-            // myMap.geoObjects.add(placemark);
-        }
 
         var customBalloonContentLayout = ymaps.templateLayoutFactory.createClass([
             '<ul class=list>',
@@ -242,7 +223,7 @@
             '</ul>'
         ].join(''));
 
-        var clusterer = new ymaps.Clusterer({
+        clusterer = new ymaps.Clusterer({
             clusterDisableClickZoom: true,
             clusterOpenBalloonOnClick: true,
             clusterBalloonContentLayout: customBalloonContentLayout
@@ -250,11 +231,19 @@
         // for (let placemark in placemarks) {
         //     console.log(placema)
         // }
-        console.log(placemarks)
 
         
 
         myMap.geoObjects.add(clusterer)
+
+
+        //   myMap.panTo(point.geometry.getCoordinates());
+
+        
+          
+        fillMarkers()
+        //   myMap.geoObjects.add(placemarks)
+        
         clusterer.add(placemarks)
         // clusterer.events.add('balloonopen', function(e) {
         //     e.preventDefault();
