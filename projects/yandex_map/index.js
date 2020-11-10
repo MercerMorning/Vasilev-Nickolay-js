@@ -206,13 +206,13 @@
                         alert("Возникла ошибка: " + error.message);
                     }
                 )
-
+                console.timeLog(address)
                 await myMap.balloon.open(coords, {
                     contentHeader: address,
                 },
                 { 
                     layout: 'my#layout',
-                    address: [address],
+                    address: address,
                 },
                 );
                 setButtons(coords);
@@ -300,7 +300,7 @@
             clusterBalloonLayout: customBalloonContentLayout
         });
         for (let geoObject in myMap.geoObjects.properties) {
-            console.log(placemark)
+            console.log(geoObject)
         }  
 
         clusterer.events.add('balloonopen', function (e) {
@@ -312,8 +312,4 @@
         fillMarkers()
     }
 
-    
-
-   
-    // document.body.onmousemove = (e) => console.log(e)
     
