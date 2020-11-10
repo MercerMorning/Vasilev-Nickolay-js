@@ -160,7 +160,11 @@
             `<div class="balloonContainer">
             <div class="balloonHeader"> 
             <p class="address">
+            {% if contentHeader %}
+                $[contentHeader]
+            {% else %}
                 $[properties.address]
+            {% endif %}
             </p><i class="fas fa-times close-btn"></i>
             </div>
             <div class="balloonContent">
