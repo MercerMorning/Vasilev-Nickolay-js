@@ -258,8 +258,8 @@
                 
                 {% endfor %}
                 <div class="actions">
-                    <a class='previous-slide'>Предыдущий</a>
-                   <a class='next-slide'>Следующий</a>
+                    <button class='previous-slide'>Предыдущий</button>
+                   <button class='next-slide'>Следующий</button>
                 </div>
             </div>
             `
