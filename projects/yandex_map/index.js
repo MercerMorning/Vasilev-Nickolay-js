@@ -9,6 +9,7 @@
     // storage.clear()
 
     var myMap,
+        prevBtn,
         addBtn,
         closeBtn,
         inputName,
@@ -70,6 +71,7 @@
                   return element.coords.join('') === item.coords.join('');
               }).comment.push(
                   {
+                      date: dateWrite(),
                       author: item.commentatorName,
                       place: item.place,
                       desc: item.desc,
@@ -80,6 +82,7 @@
             markers.push({
               coords: item.coords,
               comment: [{
+                  date: dateWrite(),
                   author: item.commentatorName,
                   place: item.place,
                   desc: item.desc,
@@ -90,26 +93,23 @@
       
       
         for (let marker of markers) {
-          // console.log(marker)
-          placemarks.push(newMarker(marker.coords, marker.comment));
-          // myMap.geoObjects.add(newMarker(marker.coords, marker.comment))
+          newMarker(marker.coords, marker.comment);
         }
     }
 
     async function newMarker(coords, comments = []) {
         var geocoder = new ymaps.geocode(coords, {results: 1});
-            var address;
-            await geocoder.then(
-                (res) => {
-                    if (res.geoObjects.getLength()) {
-                        address = res.geoObjects.get(0).properties.get('name');
-                        // console.log(address)
-                    }
-                },
-                function (error) {
-                alert("Возникла ошибка: " + error.message);
+        var address;
+        await geocoder.then(
+            (res) => {
+                if (res.geoObjects.getLength()) {
+                    address = res.geoObjects.get(0).properties.get('name');
                 }
-            )
+            },
+            function (error) {
+                alert("Возникла ошибка: " + error.message);
+            }
+        )
         let placemark =  new ymaps.Placemark(coords,
             {
                 address: address,
@@ -124,11 +124,29 @@
             setButtons(coords);
         })
         clusterer.add(placemark)
-        // myMap.geoObjects.add(placemark);
     }
 
+    function dateWrite() {
+        var date = new Date();
+    
+        var day = date.getDate();
+    
+        if (day < 10) day = '0' + day;
+    
+        var month = date.getMonth() + 1;
+    
+        if (month < 10) month = '0' + month;
+    
+        var year = date.getFullYear();
+    
+    
+        var d = day + '.' + month + '.' + year;
+       
+        return d;
+    }
+    
+
     function init(){
-        // Создание карты.
         myMap = new ymaps.Map("map", {
             center: [55.76, 37.64],
             zoom: 7,
@@ -142,11 +160,7 @@
             `<div class="balloonContainer">
             <div class="balloonHeader"> 
             <p class="address">
-            {% if contentHeader %}
-                $[contentHeader]
-            {% else %}
                 $[properties.address]
-            {% endif %}
             </p><i class="fas fa-times close-btn"></i>
             </div>
             <div class="balloonContent">
@@ -154,6 +168,7 @@
                 {% if properties.comments %} 
                 {% for comment in properties.comments %}
                     <b>{{ comment.author }}</b>
+                    <b>{{ comment.date }}</b>
                     <span>{{ comment.place }}</span>
                     <p>{{ comment.desc }}</p>
                 {% endfor %}
@@ -173,6 +188,8 @@
         );
 
         ymaps.layout.storage.add('my#layout', myBalloonLayout);
+
+      
 
         myMap.events.add('click', async function (e) {
             if (!myMap.balloon.isOpen()) {
@@ -211,34 +228,71 @@
 
         var customBalloonContentLayout = ymaps.templateLayoutFactory.createClass([
             // Выводим в цикле список всех геообъектов.
-            `{% for geoObject in properties.geoObjects %}
-                <div class="balloonContainer">
-                    <div class="balloonHeader"> 
-                        <p class="address">
-                            {{ geoObject.properties.address }}
-                        </p>
-                        <i class="fas fa-times close-btn"></i>
-                    </div>
-                <div class="balloonContent">
-                    <div class="comments">
-                        {% if geoObject.properties.comments %} 
-                            {% for comment in geoObject.properties.comments %}
-                                <b>{{ comment.author }}</b>
-                                <span>{{ comment.place }}</span>
-                                <p>{{ comment.desc }}</p>
-                            {% endfor %}
-                        {% else %} 
-                            нет комментириев 
-                        {% endif %}
-                    </div>     
+            
+            `
+            <div class="balloonClaster">
+                {% for geoObject in properties.geoObjects %}
+                    <div class="balloonContainer baloon-slide">
+                        <div class="balloonHeader"> 
+                            <p class="address">
+                                {{ geoObject.properties.address }}
+                            </p>
+                            <i class="fas fa-times close-btn"></i>
+                        </div>
+                        <div class="balloonContent">
+                            <div class="comments">
+                                {% if geoObject.properties.comments %} 
+                                    {% for comment in geoObject.properties.comments %}
+                                        <b>{{ comment.author }}</b>
+                                        <span>{{ comment.place }}</span>
+                                        <p>{{ comment.desc }}</p>
+                                    {% endfor %}
+                                {% else %} 
+                                    нет комментириев 
+                                {% endif %}
+                            </div>     
+                        </div>
+                        
+                   </div>
+                   
+                
+                {% endfor %}
+                <div class="actions">
+                    <a class='previous-slide'>Предыдущий</a>
+                   <a class='next-slide'>Следующий</a>
                 </div>
             </div>
-            
-               
-            {% endfor %}`
+            `
 
             
         ].join(''));
+
+        function setSlideButtons() {
+            let nextBtn = document.body.querySelector('.next-slide'),
+                prevBtn = document.body.querySelector('.previous-slide'),
+                balloonClaster = document.body.querySelector('.balloonClaster');
+                currentSlide =  balloonClaster.firstElementChild,
+                actionsContainer = document.body.querySelector('.actions');
+
+                // console.log(balloonClaster.firstElementChild)
+            currentSlide.classList.add('active')
+                
+            nextBtn = document.body.querySelector('.next-slide')
+            
+            actionsContainer.addEventListener('click', (e) => {
+                if (e.target.className == 'next-slide' && currentSlide.nextElementSibling.classList.contains('baloon-slide')) {
+                    console.log(currentSlide.nextElementSibling)
+                    currentSlide.classList.remove('active');
+                    currentSlide.nextElementSibling.classList.add('active')
+                    currentSlide = currentSlide.nextElementSibling;
+                }
+                if (e.target.className == 'previous-slide' && currentSlide.previousElementSibling.classList.contains('baloon-slide')) {
+                    currentSlide.classList.remove('active');
+                    currentSlide.previousElementSibling.classList.add('active')
+                    currentSlide = currentSlide.previousElementSibling;
+                }
+            })
+        }
 
         clusterer = new ymaps.Clusterer({
             clusterDisableClickZoom: true,
@@ -247,26 +301,15 @@
         });
         for (let geoObject in myMap.geoObjects.properties) {
             console.log(placemark)
-        }
+        }  
 
-        
+        clusterer.events.add('balloonopen', function (e) {
+           setSlideButtons()
+        });
 
         myMap.geoObjects.add(clusterer)
-        
-       
-        //   myMap.panTo(point.geometry.getCoordinates());
 
-        
-          
         fillMarkers()
-        //   myMap.geoObjects.add(placemarks)
-        
-        // clusterer.add(placemarks)
-        // clusterer.events.add('balloonopen', function(e) {
-        //     e.preventDefault();
-        //     alert(123)
-        // });
-        // clusterer.balloon.open(clusterer.getClusters()[0]);
     }
 
     
