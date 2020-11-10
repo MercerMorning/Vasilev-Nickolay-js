@@ -21,6 +21,11 @@
 
     let placemarks = [];
 
+    function openPlacemarkBalloon(address) {
+        clusterer.balloon.close();
+        console.log(clusterer.getGeoObjects()[0].balloon.open())
+    }
+
     function setButtons(coords) {
         addBtn = document.body.querySelector('.add-btn')
         closeBtn = document.body.querySelector('.close-btn')
@@ -123,7 +128,9 @@
             coords = placemark.geometry.getCoordinates();
             setButtons(coords);
         })
+        // placemark.balloon.open()
         clusterer.add(placemark)
+        return placemark;
     }
 
     function dateWrite() {
@@ -238,7 +245,7 @@
                 {% for geoObject in properties.geoObjects %}
                     <div class="balloonContainer baloon-slide">
                         <div class="balloonHeader"> 
-                            <p class="address">
+                            <p class="address" onclick="openPlacemarkBalloon( '{{ geoObject.properties.address }}' )">
                                 {{ geoObject.properties.address }}
                             </p>
                             <i class="fas fa-times close-btn"></i>
