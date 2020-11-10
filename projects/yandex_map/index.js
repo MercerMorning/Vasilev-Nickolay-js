@@ -23,7 +23,11 @@
 
     function openPlacemarkBalloon(address) {
         clusterer.balloon.close();
-        console.log(clusterer.getGeoObjects()[0].balloon.open())
+        // console.log(clusterer.getGeoObjects()[0].properties.get("address"))
+        // console.log(clusterer.getGeoObjects()[7].balloon.open())
+        let bal = clusterer.getGeoObjects().filter(obj => obj.properties.get("address") == address)
+        // console.log(clusterer.getGeoObjects()[0])
+        bal[0].balloon.open();
     }
 
     function setButtons(coords) {
@@ -121,6 +125,9 @@
                 comments: comments,
             },
             {
+                iconLayout: 'default#image',
+                iconImageHref: 'placemark.png',
+                iconImageSize: [23, 28],
                 balloonLayout: 'my#layout',
             }
         )
@@ -291,16 +298,24 @@
             nextBtn = document.body.querySelector('.next-slide')
             
             actionsContainer.addEventListener('click', (e) => {
-                if (e.target.className == 'next-slide' && currentSlide.nextElementSibling.classList.contains('baloon-slide')) {
+                if (e.target.className == 'next-slide' && currentSlide.nextElementSibling && currentSlide.nextElementSibling.classList.contains('baloon-slide')) {
                     console.log(currentSlide.nextElementSibling)
                     currentSlide.classList.remove('active');
                     currentSlide.nextElementSibling.classList.add('active')
                     currentSlide = currentSlide.nextElementSibling;
+                } else {
+                    currentSlide.classList.remove('active');
+                    currentSlide = balloonClaster.firstElementChild;
+                    currentSlide.nextElementSibling.classList.add('active')
                 }
-                if (e.target.className == 'previous-slide' && currentSlide.previousElementSibling.classList.contains('baloon-slide')) {
+                if (e.target.className == 'previous-slide' && currentSlide.previousElementSibling && currentSlide.previousElementSibling.classList.contains('baloon-slide')) {
                     currentSlide.classList.remove('active');
                     currentSlide.previousElementSibling.classList.add('active')
                     currentSlide = currentSlide.previousElementSibling;
+                } else {
+                    // currentSlide.classList.remove('active');
+                    // currentSlide = balloonClaster.lastElementChild;
+                    // currentSlide.previousElementSibling.classList.add('active')
                 }
             })
         }
