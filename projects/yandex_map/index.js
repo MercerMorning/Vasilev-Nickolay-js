@@ -26,8 +26,21 @@
         // console.log(clusterer.getGeoObjects()[0].properties.get("address"))
         // console.log(clusterer.getGeoObjects()[7].balloon.open())
         let bal = clusterer.getGeoObjects().filter(obj => obj.properties.get("address") == address)
-        // console.log(clusterer.getGeoObjects()[0])
-        bal[0].balloon.open();
+        let error = true;
+        while(error) {
+            try {
+                myMap.setCenter(bal[0].geometry.getCoordinates());
+                bal[0].balloon.open()
+                error = false;
+            } catch {
+                myMap.setZoom( myMap.getZoom() + 1 );
+                continue;
+            }
+        }
+        
+        
+        
+        // bal[0].balloon.open();
     }
 
     function setButtons(coords) {
@@ -320,18 +333,27 @@
             })
         }
 
+        var customItemContentLayout = ymaps.templateLayoutFactory.createClass(
+            // The "raw" flag means that data is inserted "as is" without escaping HTML.
+            ` <p class="address" onclick="openPlacemarkBalloon( '{{ geoObject.properties.address }}' )">
+            {{ properties.address|raw }}
+            </p>`
+        );
+
         clusterer = new ymaps.Clusterer({
             clusterDisableClickZoom: true,
             clusterOpenBalloonOnClick: true,
-            clusterBalloonLayout: customBalloonContentLayout
+            clusterBalloonContentLayout: 'cluster#balloonCarousel',
+            clusterBalloonItemContentLayout: customItemContentLayout,
+            // clusterBalloonLayout: customBalloonContentLayout
         });
         for (let geoObject in myMap.geoObjects.properties) {
             console.log(geoObject)
         }  
 
-        clusterer.events.add('balloonopen', function (e) {
-           setSlideButtons()
-        });
+        // clusterer.events.add('balloonopen', function (e) {
+        //    setSlideButtons()
+        // });
 
         myMap.geoObjects.add(clusterer)
 
