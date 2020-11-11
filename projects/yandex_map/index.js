@@ -21,22 +21,39 @@
 
     let placemarks = [];
 
-    function openPlacemarkBalloon(address) {
+    async function openPlacemarkBalloon(address) {
         clusterer.balloon.close();
-        // console.log(clusterer.getGeoObjects()[0].properties.get("address"))
-        // console.log(clusterer.getGeoObjects()[7].balloon.open())
+
         let bal = clusterer.getGeoObjects().filter(obj => obj.properties.get("address") == address)
-        let error = true;
-        while(error) {
-            try {
-                myMap.setCenter(bal[0].geometry.getCoordinates());
-                bal[0].balloon.open()
-                error = false;
-            } catch {
-                myMap.setZoom( myMap.getZoom() + 1 );
-                continue;
-            }
-        }
+        let comments = bal[0].properties.get('comments');
+        
+        await myMap.balloon.open(coords, {
+            contentHeader: address,
+            contentFooter: comments,
+            address: address,
+            comments: comments,
+        },
+        { 
+            layout: 'my#layout',
+            address: address,
+            comments: comments,
+        },
+        );
+        setButtons( bal[0].geometry.getCoordinates());
+
+        
+        // let bal = clusterer.getGeoObjects().filter(obj => obj.properties.get("address") == address)
+        // let error = true;
+        // while(error) {
+        //     try {
+                // myMap.setCenter(bal[0].geometry.getCoordinates());
+        //         bal[0].balloon.open()
+        //         error = false;
+        //     } catch {
+        //         myMap.setZoom( myMap.getZoom() + 1 );
+        //         continue;
+        //     }
+        // }
         
         
         
@@ -196,15 +213,24 @@
             </div>
             <div class="balloonContent">
             <div class="comments">
-                {% if properties.comments %} 
-                {% for comment in properties.comments %}
+            {% if contentFooter %}
+                {% for comment in contentFooter %}
                     <b>{{ comment.author }}</b>
                     <b>{{ comment.date }}</b>
                     <span>{{ comment.place }}</span>
                     <p>{{ comment.desc }}</p>
                 {% endfor %}
-                {% else %} 
-                    нет комментириев 
+            {% else %}
+                {% if properties.comments %} 
+                    {% for comment in properties.comments %}
+                        <b>{{ comment.author }}</b>
+                        <b>{{ comment.date }}</b>
+                        <span>{{ comment.place }}</span>
+                        <p>{{ comment.desc }}</p>
+                    {% endfor %}
+                    {% else %} 
+                        нет комментириев 
+                    {% endif %}
                 {% endif %}
             </div>
             <h3>Ваш отзыв</h3>
@@ -351,9 +377,9 @@
             console.log(geoObject)
         }  
 
-        // clusterer.events.add('balloonopen', function (e) {
-        //    setSlideButtons()
-        // });
+        clusterer.events.add('balloonopen', function (e) {
+           setSlideButtons()
+        });
 
         myMap.geoObjects.add(clusterer)
 
