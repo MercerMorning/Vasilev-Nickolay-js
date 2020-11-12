@@ -1,17 +1,4 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet">
-        <script src="https://api-maps.yandex.ru/2.1/?apikey=4040c59a-ba5a-403b-8e3a-7b3a6ac9f8a9&lang=ru_RU" type="text/javascript">
-        </script>
-    </head>
-    <body>
-        <div id="map" style="width: 100%; height: 100vh"></div>
-    </body>
-    <script src="index.js"></script>
-    <style>
-        body {
+ body {
             font-family: "Arial";
         }
 
@@ -120,6 +107,3 @@
             content: "\f3c5";
             margin-right: 5px;
         }
-    </style>
-    <script src="index.js"></script>
-</html>
