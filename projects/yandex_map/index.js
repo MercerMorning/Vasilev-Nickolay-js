@@ -274,51 +274,16 @@ ymaps.load('https://api-maps.yandex.ru/2.1/?apikey=4040c59a-ba5a-403b-8e3a-7b3a6
             
         ].join(''));
 
-        function setSlideButtons() {
-            let addressLinks = document.body.querySelectorAll('.clusterer-address');
-            let clustererBaloon = document.body.querySelector('.clusterer-baloon');
-            console.log(clustererBaloon)
-            clustererBaloon.addEventListener("DOMSubtreeModified", function() {
-                alert(123)
-              });
-            document.getElementById("demo1").addEventListener("DOMSubtreeModified", function() {
-                document.getElementById("demo2").innerHTML = "demo1 Changed!"
-              });
-            for (let addressLink of addressLinks) {
-                console.log(addressLink)
-                addressLink.addEventListener('click', function() {
-                    openPlacemarkBalloon(addressLink.dataset.address)
-                })
+        document.addEventListener('click', (e) => {
+            let target = e.target;
+    
+            if ( target.className === 'clusterer-address' ) {
+                // alert(123)
+                openPlacemarkBalloon(e.target.dataset.address)
             }
+        });
 
-                // console.log(balloonClaster.firstElementChild)
-            // currentSlide.classList.add('active')
-                
-            // nextBtn = document.body.querySelector('.next-slide')
-            
-            // actionsContainer.addEventListener('click', (e) => {
-            //     if (e.target.className == 'next-slide' && currentSlide.nextElementSibling && currentSlide.nextElementSibling.classList.contains('baloon-slide')) {
-            //         console.log(currentSlide.nextElementSibling)
-            //         currentSlide.classList.remove('active');
-            //         currentSlide.nextElementSibling.classList.add('active')
-            //         currentSlide = currentSlide.nextElementSibling;
-            //     } else {
-            //         currentSlide.classList.remove('active');
-            //         currentSlide = balloonClaster.firstElementChild;
-            //         currentSlide.nextElementSibling.classList.add('active')
-            //     }
-            //     if (e.target.className == 'previous-slide' && currentSlide.previousElementSibling && currentSlide.previousElementSibling.classList.contains('baloon-slide')) {
-            //         currentSlide.classList.remove('active');
-            //         currentSlide.previousElementSibling.classList.add('active')
-            //         currentSlide = currentSlide.previousElementSibling;
-            //     } else {
-            //         // currentSlide.classList.remove('active');
-            //         // currentSlide = balloonClaster.lastElementChild;
-            //         // currentSlide.previousElementSibling.classList.add('active')
-            //     }
-            // })
-        }
-
+        
         var customItemContentLayout = ymaps.templateLayoutFactory.createClass(
             // The "raw" flag means that data is inserted "as is" without escaping HTML.
             ` 
