@@ -363,7 +363,27 @@
             // The "raw" flag means that data is inserted "as is" without escaping HTML.
             ` <p class="address" onclick="openPlacemarkBalloon( '{{ geoObject.properties.address }}' )">
             {{ properties.address|raw }}
-            </p>`
+            </p>
+            {% if contentFooter %}
+                {% for comment in contentFooter %}
+                    <b>{{ comment.author }}</b>
+                    <b>{{ comment.date }}</b>
+                    <span>{{ comment.place }}</span>
+                    <p>{{ comment.desc }}</p>
+                {% endfor %}
+            {% else %}
+                {% if properties.comments %} 
+                    {% for comment in properties.comments %}
+                        <b>{{ comment.author }}</b>
+                        <b>{{ comment.date }}</b>
+                        <span>{{ comment.place }}</span>
+                        <p>{{ comment.desc }}</p>
+                    {% endfor %}
+                    {% else %} 
+                        нет комментириев 
+                    {% endif %}
+                {% endif %}
+            </div>`
         );
 
         clusterer = new ymaps.Clusterer({
