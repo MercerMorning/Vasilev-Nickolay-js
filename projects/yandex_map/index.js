@@ -49,30 +49,26 @@ function init(ymaps){
             </div>
             <div class="balloonContent">
             <div class="comments">
-            {% if contentFooter %}
-                {% for comment in contentFooter %}
-                    <b>{{ comment.author }}</b>
-                    <b>{{ comment.date }}</b>
-                    <span>{{ comment.place }}</span>
-                    <p>{{ comment.desc }}</p>
-                {% endfor %}
-            {% else %}
-                {% if properties.comments %} 
-                    {% for comment in properties.comments %}
-                        <b>{{ comment.author }}</b>
-                        <b>{{ comment.date }}</b>
-                        <span>{{ comment.place }}</span>
-                        <p>{{ comment.desc }}</p>
-                    {% endfor %}
-                    {% else %} 
-                        нет комментириев 
-                    {% endif %}
-                {% endif %}
+            {% if properties.comments %} 
+              {% for comment in properties.comments %}
+                  <b>{{ comment.author }}</b>
+                  <b>{{ comment.date }}</b>
+                  <span>{{ comment.place }}</span>
+                  <p>{{ comment.desc }}</p>
+              {% endfor %}
+              {% else %} 
+                  нет комментириев 
+              {% endif %}
             </div>
             <h3>Ваш отзыв</h3>
             <input type="text" id='inputName' placeholder="Ваше имя">
             <input type="text" id='inputPlace' placeholder="Укажите место">
             <input type="text" id='inputDesc' placeholder="Поделитесь впечатлениями">
+            {% if contentHeader %}
+              <input type="hidden" id='coords' name="coords" value={{ contentFooter }}>
+            {% else %} 
+            <input type="hidden" id='coords' name="coords" value=$[properties.coords]> 
+            {% endif %}
             </div>
             <div class="balloonFooter">
                 <button class="add-btn">Добавить</button>
@@ -114,13 +110,14 @@ function init(ymaps){
       )
       await ymaps.myMap.balloon.open(coords, {
             contentHeader: address,
+            contentFooter: coords,
           },
           {
             layout: 'my#layout',
             address: address,
           },
       );
-      updateMarkers(coords);
+      // updateMarkers(coords);
 
     }
     else {
@@ -133,7 +130,8 @@ function init(ymaps){
     let target = e.target,
         inputName,
         inputPlace,
-        inputDesc;
+        inputDesc,
+        inputCoords;
 
     if ( target.className === 'clusterer-address' ) {
       openPlacemarkBalloon(e.target.dataset.address)
@@ -147,9 +145,10 @@ function init(ymaps){
       inputName = document.body.querySelector('#inputName '),
       inputPlace = document.body.querySelector('#inputPlace'),
       inputDesc = document.body.querySelector('#inputDesc');
+      inputCoords = document.body.querySelector('#coords');
       console.log(inputName)
       if (inputName.value && inputPlace.value && inputDesc.value) {
-          alert(123)
+          updateMarkers(inputCoords.value.split(','), inputName.value, inputPlace.value, inputDesc.value)
       }
     }
   });

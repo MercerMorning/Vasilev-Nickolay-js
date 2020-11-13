@@ -17,23 +17,23 @@ function dateWrite() {
   return d;
 }
 
-function updateMarkers(coords) {
-  
-    // let closeBtn = document.body.querySelector('.close-btn')
-    // let storageContent = localStorage.data ? JSON.parse(localStorage.data) : [];
+function updateMarkers(coords, name, place, desc) {
+    
+    let closeBtn = document.body.querySelector('.close-btn'),
+    storageContent = localStorage.data ? JSON.parse(localStorage.data) : [];
 
-    // storageContent.push({
-    //   coords: coords,
-    //   commentatorName: inputName.value,
-    //   place: inputPlace.value,
-    //   desc: inputDesc.value,
-    // });
+    storageContent.push({
+      coords: coords,
+      commentatorName: name,
+      place: place,
+      desc: desc,
+    });
 
-    // localStorage.data = JSON.stringify(storageContent)
+    localStorage.data = JSON.stringify(storageContent)
 
-    // closeBtn.click();
+    closeBtn.click();
 
-    // fillMarkers();
+    fillMarkers();
 
 }
 
@@ -104,7 +104,7 @@ async function newMarker(coords, comments = []) {
   )
   placemark.events.add('balloonopen',  function (e) {
     coords = placemark.geometry.getCoordinates();
-    updateMarkers(coords);
+    // updateMarkers(coords);
   })
   ymaps.clusterer.add(placemark)
 }
@@ -125,7 +125,7 @@ async function openPlacemarkBalloon(address) {
         comments: comments,
       },
   );
-  updateMarkers( bal[0].geometry.getCoordinates());
+//   updateMarkers( bal[0].geometry.getCoordinates());
 
 }
 
