@@ -115,9 +115,10 @@ async function openPlacemarkBalloon(address) {
   let bal = ymaps.clusterer.getGeoObjects().filter(obj => obj.properties.get("address") == address)
   let comments = bal[0].properties.get('comments');
 
-  await ymaps.myMap.balloon.open(coords, {
+  await ymaps.myMap.balloon.open(bal[0].geometry.getCoordinates(), {
         address: address,
         comments: comments,
+        coords: bal[0].geometry.getCoordinates(),
       },
       {
         layout: 'my#layout',

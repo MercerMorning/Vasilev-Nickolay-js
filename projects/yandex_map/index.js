@@ -14,15 +14,14 @@ function init(ymaps){
             <a href='#' class="clusterer-address" data-address="{{ geoObject.properties.address }}">
                 {{ properties.address|raw }}
             </a>
-            {% if contentFooter %}
-                {% for comment in contentFooter %}
+            {% if comments %}
+                {% for comment in comments %}
                     <b>{{ comment.author }}</b>
                     <b>{{ comment.date }}</b>
                     <span>{{ comment.place }}</span>
                     <p>{{ comment.desc }}</p>
                 {% endfor %}
-            {% else %}
-                {% if properties.comments %} 
+            {% elseif (properties.comments) %}
                     {% for comment in properties.comments %}
                         <b>{{ comment.author }}</b>
                         <b>{{ comment.date }}</b>
@@ -32,15 +31,14 @@ function init(ymaps){
                     {% else %} 
                         нет комментириев 
                     {% endif %}
-                {% endif %}
             </div>`
       ),
       myBalloonLayout = ymaps.templateLayoutFactory.createClass(
           `<div class="balloonContainer">
             <div class="balloonHeader"> 
               <p class="address">
-                {% if contentHeader %}
-                    $[contentHeader]
+                {% if address %}
+                    $[address]
                 {% else %}
                     $[properties.address]
                 {% endif %}
@@ -49,23 +47,30 @@ function init(ymaps){
             </div>
             <div class="balloonContent">
             <div class="comments">
-            {% if properties.comments %} 
-              {% for comment in properties.comments %}
-                  <b>{{ comment.author }}</b>
-                  <b>{{ comment.date }}</b>
-                  <span>{{ comment.place }}</span>
-                  <p>{{ comment.desc }}</p>
-              {% endfor %}
-              {% else %} 
-                  нет комментириев 
-              {% endif %}
+            {% if comments %}
+            {% for comment in comments %}
+                <b>{{ comment.author }}</b>
+                <b>{{ comment.date }}</b>
+                <span>{{ comment.place }}</span>
+                <p>{{ comment.desc }}</p>
+            {% endfor %}
+        {% elseif (properties.comments) %}
+                {% for comment in properties.comments %}
+                    <b>{{ comment.author }}</b>
+                    <b>{{ comment.date }}</b>
+                    <span>{{ comment.place }}</span>
+                    <p>{{ comment.desc }}</p>
+                {% endfor %}
+                {% else %} 
+                    нет комментириев 
+                {% endif %}
             </div>
             <h3>Ваш отзыв</h3>
             <input type="text" id='inputName' placeholder="Ваше имя">
             <input type="text" id='inputPlace' placeholder="Укажите место">
             <input type="text" id='inputDesc' placeholder="Поделитесь впечатлениями">
-            {% if contentHeader %}
-              <input type="hidden" id='coords' name="coords" value={{ contentFooter }}>
+            {% if coords %}
+              <input type="hidden" id='coords' name="coords" value={{ coords }}>
             {% else %} 
             <input type="hidden" id='coords' name="coords" value=$[properties.coords]> 
             {% endif %}
@@ -109,8 +114,8 @@ function init(ymaps){
           }
       )
       await ymaps.myMap.balloon.open(coords, {
-            contentHeader: address,
-            contentFooter: coords,
+            address: address,
+            coords: coords,
           },
           {
             layout: 'my#layout',
