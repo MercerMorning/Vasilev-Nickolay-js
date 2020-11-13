@@ -1,0 +1,109 @@
+ body {
+            font-family: "Arial";
+        }
+
+        .baloon-slide {
+            display: none!important;
+        }
+
+        .baloon-slide.active {
+            display: block!important;
+        }
+
+        .actions {
+            width: 400px;
+            margin: auto;
+            height: 20px;
+            background: white;
+        }
+
+        .previous-slide {
+            float: left;
+        }
+
+        .next-slide {
+            float: right;
+        }
+
+        .actions .btn {
+            cursor: pointer;
+        }
+
+        /* .baloon-slide.slide-active {
+            display: block!important;
+        } */
+
+        .balloonContainer {
+            width: 400px;
+            background-color: rgb(255, 255, 255);
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .balloonHeader {
+            border-radius: 10px 10px 0px 0px;
+            padding: 5px 10px;
+            color: white;
+            font-size: 12px;
+            background-color: rgb(255, 134, 99);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;            
+        }
+
+        .close-btn {
+            font-size: 12px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .balloonContent {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .balloonContent h3 {
+            text-transform: uppercase;
+            color:  rgb(255, 134, 99);
+        }
+
+        .balloonContent input {
+            width: 97%;
+            margin: 5px 0;
+            border-radius: 27px;
+            padding: 5px;
+            border: 2px solid gray;
+        }
+
+        .balloonFooter {
+            padding: 5px 10px;
+            font-size: 12px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .add-btn {
+            background-color: rgb(255, 134, 99);
+            border-radius: 10px;
+            border: none;
+            color: white;
+            padding: 10px;
+        }
+
+        .comments {
+            border-bottom: 2px solid gray;
+            height: 150px;
+            overflow: scroll;
+
+        }
+
+        .comments > *{
+            color: rgb(79, 79, 79);
+        }
+
+        .address::before {
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900; 
+            content: "\f3c5";
+            margin-right: 5px;
+        }
